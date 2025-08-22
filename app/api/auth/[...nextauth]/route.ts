@@ -96,6 +96,20 @@ export const authOptions: any = {
       //   }
       // }
     },
+    async session({ session, token }: any) {
+      // Attach role to session
+      if (session.user && token.role) {
+        session.user.role = token.role;
+      }
+      return session;
+    },
+    async jwt({ token, user }: any) {
+      // Attach role to JWT token
+      if (user && user.role) {
+        token.role = user.role;
+      }
+      return token;
+    },
   },
 };
 

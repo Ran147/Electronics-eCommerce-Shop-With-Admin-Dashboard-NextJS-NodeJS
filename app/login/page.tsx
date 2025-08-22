@@ -11,14 +11,30 @@ const LoginPage = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   // const session = useSession();
-  const { data: session, status: sessionStatus } = useSession();
+  interface SessionUser {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string | null;
+  }
+
+  interface Session {
+    user?: SessionUser;
+    [key: string]: any;
+  }
+
+  const { data: session, status: sessionStatus } = useSession() as { data: Session | null, status: string };
 
   useEffect(() => {
     // if user has already logged in redirect to home page
     if (sessionStatus === "authenticated") {
-      router.replace("/");
+      if(session?.user?.role === "admin"){
+        router.replace("/admin");
+      } else {
+        router.replace("/");
+      }
     }
-  }, [sessionStatus, router]);
+  }, [sessionStatus, session?.user?.role, router]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
