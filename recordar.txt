@@ -1,4 +1,4 @@
-Antes de correrlo, verificar que el servicio MySQL80 este corriendo en los services de la laptop.
+IMPORTANTE ----> Antes de correr el proyecto, verificar que el servicio MySQL80 este corriendo en los services de la maquina.
 
 backend-> node app.js
 frontend-> npm run dev
