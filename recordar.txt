@@ -1,0 +1,11 @@
+Antes de correrlo, verificar que el servicio MySQL80 este corriendo en los services de la laptop.
+
+backend-> node app.js
+frontend-> npm run dev
+prisma db -> npx prisma studio
+
+Para correr playwright: 
+npx playwright test --project=chromium
+
+Para analizar con codegen
+npx playwright codegen http://localhost:3000/"direccion"
