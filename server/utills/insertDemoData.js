@@ -121,7 +121,7 @@ const demoProducts = [
     slug: "smart-watch-demo",
     manufacturer: "Samsung",
     categoryId: "a6896b67-197c-4b2a-b5e2-93954474d8b4",
-    inStock: 1,
+    inStock: 5,
   },
   {
     id: "11",

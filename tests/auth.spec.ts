@@ -478,4 +478,6 @@ test.describe('Módulo de Autenticación y Registro', () => {
     expect(validationMessage).toBe('Please fill out this field.');
   });
 
+  
+
 });
