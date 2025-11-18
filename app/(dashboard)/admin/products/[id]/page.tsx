@@ -1,14 +1,14 @@
 "use client";
-import { CustomButton, DashboardSidebar, SectionTitle } from "@/components";
+import { DashboardSidebar } from "@/components";
+import { nanoid } from "nanoid";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   convertCategoryNameToURLFriendly as convertSlugToURLFriendly,
   formatCategoryName,
 } from "../../../../../utils/categoryFormating";
-import { nanoid } from "nanoid";
 
 interface DashboardProductDetailsProps {
   params: { id: number };
