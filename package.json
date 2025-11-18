@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:types": "tsc --noEmit --project tsconfig.jest.json"
+
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
@@ -34,6 +40,15 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
+<<<<<<< HEAD
+=======
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+>>>>>>> main
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -43,10 +58,13 @@
     "daisyui": "^4.7.2",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8",
     "prisma": "^5.10.2",
     "supertest": "^7.1.4",
     "tailwindcss": "^3.3.0",
+    "ts-jest": "^29.4.5",
     "typescript": "^5"
   }
 }

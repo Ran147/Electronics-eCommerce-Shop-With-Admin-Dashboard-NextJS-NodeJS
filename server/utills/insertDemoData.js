@@ -121,7 +121,7 @@ const demoProducts = [
     slug: "smart-watch-demo",
     manufacturer: "Samsung",
     categoryId: "a6896b67-197c-4b2a-b5e2-93954474d8b4",
-    inStock: 1,
+    inStock: 5,
   },
   {
     id: "11",
@@ -214,19 +214,18 @@ const demoCategories = [
 ];
 
 async function insertDemoData() {
-  
-  for (const category of demoCategories) {
-    await prisma.category.create({
-      data: category,
-    });
-  }
+  // Insert categories, skipping any that already exist
+  await prisma.category.createMany({
+    data: demoCategories,
+    skipDuplicates: true, // This will skip records with duplicate IDs
+  });
   console.log("Demo categories inserted successfully!");
-  
-  for (const product of demoProducts) {
-    await prisma.product.create({
-      data: product,
-    });
-  }
+
+  // Insert products, skipping any that already exist
+  await prisma.product.createMany({
+    data: demoProducts,
+    skipDuplicates: true, // This will skip records with duplicate IDs
+  });
   console.log("Demo products inserted successfully!");
 }
 
