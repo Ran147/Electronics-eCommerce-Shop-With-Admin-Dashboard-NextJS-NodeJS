@@ -478,4 +478,36 @@ test.describe('Módulo de Autenticación y Registro', () => {
     expect(validationMessage).toBe('Please fill out this field.');
   });
 
+
+
+
+  /*
+   * =================================================================
+   * CP-AUT-013 (Caso 49): SOLICITUD RESET CONTRASEÑA (CORREO VÁLIDO)
+   * =================================================================
+   */
+  
+  /**
+   * CÓDIGO: CP-AUT-013 
+   * NOMBRE: Solicitud de restablecimiento de contraseña con correo válido. 
+   *
+   */
+test('CP-AUT-013: Verificar la visibilidad del enlace "Forgot password?"', async ({ page }) => {
+    
+    // --- Precondiciones ---
+    // 1. El usuario se encuentra en la página de login
+    await page.goto('/login');
+  
+    // --- Paso de Ejecución y Verificación ---
+    
+    // 1. Localizar el enlace exactamente por su texto.
+    const forgotPasswordLink = page.getByRole('link', { name: 'Forgot password?' });
+  
+    // 2. Verificar que el enlace es visible en la página.
+    await expect(forgotPasswordLink).toBeVisible();
+
+    // 3. Verificar que es un enlace "dummy".
+    await expect(forgotPasswordLink).toHaveAttribute('href', '#');
+  });
+
 });
