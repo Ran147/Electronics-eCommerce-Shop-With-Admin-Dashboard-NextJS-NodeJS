@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// --- CAMBIO 1: Definimos la URL base dinámicamente ---
+// Si Docker nos pasa la variable (http://frontend:3000), usamos esa.
+// Si no (tu PC local), usamos http://localhost:3000.
+const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -14,7 +19,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  testIgnore: '**/*.api.spec.ts', // <-- AÑADE ESTA LÍNEA
+  testIgnore: '**/*.api.spec.ts',
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -27,7 +32,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: 'http://localhost:3000',
+    baseURL: baseURL, // --- CAMBIO 2: Usamos la variable aquí ---
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -49,33 +54,14 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-   // Asegúrate de que este sea el comando para iniciar tu frontend de Next.js
-    command: 'npm run dev', 
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: {
+    // Asegúrate de que este sea el comando para iniciar tu frontend de Next.js
+    command: 'npm run dev',
+    url: baseURL, // --- CAMBIO 3: Usamos la variable para que busque en el lugar correcto ---
+    reuseExistingServer: true, // --- CAMBIO 4: Forzamos a true para que detecte que el frontend ya está corriendo ---
+    timeout: 120 * 1000, // --- CAMBIO 5: Damos 2 minutos de margen por si acaso ---
+  },
 });

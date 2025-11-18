@@ -23,8 +23,7 @@ services:
       - "3001:3001"
     environment:
       DATABASE_URL: "mysql://root:rootpassword@db:3306/ecommerce_db"
-      # --- AGREGA ESTA LÍNEA DEBAJO ---
-      PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: "1"
+      PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: "1" # Evita errores con Prisma en contenedores
     depends_on:
       db:
         condition: service_healthy
@@ -36,7 +35,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3001"
+      NEXT_PUBLIC_API_URL: "http://localhost:3001" # Para el navegador (Client side)
+      INTERNAL_API_URL: "http://server:3001"       # Para el servidor Next.js (Server side) <--- AGREGAR ESTO
+      DATABASE_URL: "mysql://root:rootpassword@db:3306/ecommerce_db"
     depends_on:
       - server
 
@@ -63,6 +64,6 @@ services:
       BASE_URL: "http://frontend:3000"
     # Aquí está el cambio: --project=chromium
     command: >
-      sh -c "npm ci && npx playwright install chromium && npx playwright test --project=chromium"
+      sh -c "npm install && npx playwright install chromium && npx playwright test --project=chromium"
     depends_on:
       - frontend

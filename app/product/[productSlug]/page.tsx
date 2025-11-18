@@ -20,15 +20,18 @@ interface ImageItem {
 }
 
 const SingleProductPage = async ({ params }: SingleProductPageProps) => {
+  // Usamos la variable de entorno si existe (Docker), si no, localhost (Tu PC)
+  const apiUrl = process.env.INTERNAL_API_URL || 'http://localhost:3001';
+
   // sending API request for a single product with a given product slug
   const data = await fetch(
-    `http://localhost:3001/api/slugs/${params.productSlug}`
+    `${apiUrl}/api/slugs/${params.productSlug}`
   );
   const product = await data.json();
 
   // sending API request for more than 1 product image if it exists
   const imagesData = await fetch(
-    `http://localhost:3001/api/images/${product.id}`
+    `${apiUrl}/api/images/${product.id}`
   );
   const images = await imagesData.json();
 

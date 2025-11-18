@@ -13,3 +13,16 @@ npx playwright codegen http://localhost:3000/"direccion"
 Para jest
 npm test store.test.ts
 npm test "nombre del file especifico"
+
+Docker
+
+# Detener y eliminar todos los contenedores
+docker-compose down -v
+
+# Limpiar imágenes antiguas
+docker system prune -a
+
+Construir docker --
+
+docker-compose build --no-cache
+docker-compose up

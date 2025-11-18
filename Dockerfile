@@ -1,17 +1,24 @@
-# Dockerfile (Frontend)
+# Dockerfile (Frontend - Raíz)
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Instalamos dependencias
+# Instalamos OpenSSL (Necesario para Prisma en Linux)
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
 RUN npm install
 
-# Copiamos el código
+# Copiamos el resto del código
 COPY . .
 
-# Exponemos el puerto de Next.js
+# --- NUEVO: Copiamos el esquema desde la carpeta server ---
+# Esto es vital: el frontend necesita ver el archivo schema.prisma para saber cómo conectarse
+COPY server/prisma ./prisma/
+
+# --- NUEVO: Generamos el cliente de Prisma para el Frontend ---
+RUN npx prisma generate
+
 EXPOSE 3000
 
-# Iniciamos la página en modo desarrollo
 CMD ["npm", "run", "dev"]
