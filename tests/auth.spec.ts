@@ -478,7 +478,6 @@ test.describe('Módulo de Autenticación y Registro', () => {
     expect(validationMessage).toBe('Please fill out this field.');
   });
 
-<<<<<<< HEAD
 
 
 
@@ -510,8 +509,5 @@ test('CP-AUT-013: Verificar la visibilidad del enlace "Forgot password?"', async
     // 3. Verificar que es un enlace "dummy".
     await expect(forgotPasswordLink).toHaveAttribute('href', '#');
   });
-=======
-  
->>>>>>> main
 
 });
