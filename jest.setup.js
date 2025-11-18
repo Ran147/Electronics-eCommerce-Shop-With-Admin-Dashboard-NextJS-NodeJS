@@ -1,27 +1,5 @@
-<<<<<<< HEAD
-// jest.setup.js
-require('@testing-library/jest-dom');
-const { act } = require('@testing-library/react');
-
-// CORRECCIÓN 1: Importar 'useProductStore'
-const { useProductStore } = require('./app/_zustand/store'); 
-
-const initialState = useProductStore.getState();
-
-beforeEach(() => {
-  act(() => {
-    // CORRECCIÓN 2: Usar 'useProductStore'
-    useProductStore.setState(initialState, true);
-  });
-  // CORRECCIÓN 3: Limpiar 'sessionStorage' (como dice tu store.ts)
-  sessionStorage.clear();
-});
-
-afterEach(() => {
-  sessionStorage.clear();
-});
-=======
 import '@testing-library/jest-dom';
+const { act } = require('@testing-library/react');
 
 // --- Mock para next/navigation ---
 jest.mock('next/navigation', () => ({
@@ -46,7 +24,6 @@ jest.mock('nanoid', () => ({
   nanoid: () => 'mock-id-123',
 }));
 
-
 // --- Mock global de matchMedia para react-slick ---
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -60,6 +37,28 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
+});
+
+// --- Configuración de stores (Zustand) ---
+// NOTA: Asegúrate de que la ruta del store sea correcta
+try {
+  const { useProductStore } = require('./app/_zustand/store');
+  const initialState = useProductStore.getState();
+
+  beforeEach(() => {
+    act(() => {
+      useProductStore.setState(initialState, true);
+    });
+    sessionStorage.clear();
+  });
+} catch (error) {
+  // Si el store no existe, ignorar silenciosamente
+  console.warn('Store configuration skipped:', error.message);
+}
+
+// --- Limpieza después de cada test ---
+afterEach(() => {
+  sessionStorage.clear();
 });
 
 // --- Silenciar ciertos console.error durante los tests ---
@@ -80,4 +79,3 @@ beforeAll(() => {
 afterAll(() => {
   console.error = originalError;
 });
->>>>>>> LuisBranch
