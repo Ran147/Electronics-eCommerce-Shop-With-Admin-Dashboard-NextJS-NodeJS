@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Módulo de Administrador (CP-ADM)', () => {
 
@@ -12,19 +12,19 @@ test.describe('Módulo de Administrador (CP-ADM)', () => {
    * CÓDIGO: CP-ADM-006
    * NOMBRE: Intento de acceso a una ruta de administrador por un usuario no autorizado.
    *
-   */
+  */
   test('CP-ADM-006: Intento de acceso a ruta admin por usuario no autorizado', async ({ page }) => {
 
     // --- Datos de Prueba ---
-    
+
     // 1. Precondición: Usamos un usuario que existe y asumimos [cite_start]
     //     que tiene el rol de "Cliente" (no-admin)[cite: 828].
-    const userEmail = 'joshuapicado0312@gmail.com'; 
-    const userPass = 'Joshua24092003';            
-    
+    const userEmail = 'joshuapicado0312@gmail.com';
+    const userPass = 'Joshua24092003';
+
     //    Esta es la ruta protegida que un "Cliente" NO debería poder ver.
-    const adminURL = '/admin'; 
-    
+    const adminURL = '/admin';
+
     // 3. Resultado Esperado: La URL a la que el sistema debe redirigir
     const expectedRedirectURL = '/';
 
@@ -62,5 +62,6 @@ test.describe('Módulo de Administrador (CP-ADM)', () => {
     //    Esto confirma que la redirección fue exitosa.
     await expect(page).not.toHaveURL(adminURL);
   });
+
 
 });
