@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
 const { act } = require('@testing-library/react');
 
+const { TextEncoder, TextDecoder } = require('util');
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 // --- Mock para next/navigation ---
 jest.mock('next/navigation', () => ({
   useRouter: () => ({

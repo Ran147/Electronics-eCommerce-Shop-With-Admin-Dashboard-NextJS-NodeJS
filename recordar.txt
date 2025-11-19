@@ -26,3 +26,23 @@ Construir docker --
 
 docker-compose build --no-cache
 docker-compose up
+docker-compose up --build
+
+GUIA
+-TENER DOCKER DESKTOP INSTALADO Y ABIERTO CUANDO ESTES ACA TRABAJANDO CON EL PROYECTO
+- CORRER docker-compose up --build EN RAIZ
+- LISTO(LES VA A DURAR UNOS MINUTOS EN CORRER Y NO SE PREOCUPEN SI LA COMPUTADORA LES COMIENZA A VOLAR)
+-SI NECESITAN REINICIAR EL DOCKER USAR docker-compose down -v Y VOLVER A CONTRUIR CON docker-compose up --build
+- VEAN EL VIDEO QUE LES VOY A MANDAR PARA REPORTE DE ERRORES EN PLAYWRIGHT.
+
+
+
+
+---ignorar esto de abajo.
+contar pruebas jest
+store.test --> 2
+quantity.. --> 2
+schema.test --> 2
+admin.api --> 5
+productstockvalidation --> 4
+categorydeletion--1 fuck

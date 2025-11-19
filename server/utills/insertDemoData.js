@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -149,84 +150,84 @@ const demoProducts = [
   }
 ];
 
-
 const demoCategories = [
-  {
-    id: "7a241318-624f-48f7-9921-1818f6c20d85",
-    name: "speakers",
-  },
-  {
-    id: "313eee86-bc11-4dc1-8cb0-6b2c2a2a1ccb",
-    name: "trimmers",
-  },
-  {
-    id: "782e7829-806b-489f-8c3a-2689548d7153",
-    name: "laptops",
-  },
-  {
-    id: "a6896b67-197c-4b2a-b5e2-93954474d8b4",
-    name: "watches",
-  },
-  {
-    id: "4c2cc9ec-7504-4b7c-8ecd-2379a854a423",
-    name: "headphones",
-  },
-  {
-    id: "8d2a091c-4b90-4d60-b191-114b895f3e54",
-    name: "juicers",
-  },
-  {
-    id: "1cb9439a-ea47-4a33-913b-e9bf935bcc0b",
-    name: "earbuds",
-  },
-  {
-    id: "ada699e5-e764-4da0-8d3e-18a8c8c5ed24",
-    name: "tablets",
-  },
-  {
-    id: "d30b85e2-e544-4f48-8434-33fe0b591579",
-    name: "phone-gimbals",
-  },
-  {
-    id: "6c3b8591-b01e-4842-bce1-2f5585bf3a28",
-    name: "mixer-grinders",
-  },
-  {
-    id: "659a91b9-3ff6-47d5-9830-5e7ac905b961",
-    name: "cameras",
-  },
-  {
-    id: "3117a1b0-6369-491e-8b8b-9fdd5ad9912e",
-    name: "smart-phones",
-  },
-  {
-    id: "da6413b4-22fd-4fbb-9741-d77580dfdcd5",
-    name: "mouses"
-  },
-  {
-    id: "ss6412b4-22fd-4fbb-9741-d77580dfdcd2",
-    name: "computers"
-  },
-  {
-    id: "fs6412b4-22fd-4fbb-9741-d77512dfdfa3",
-    name: "printers"
-  }
+  { id: "7a241318-624f-48f7-9921-1818f6c20d85", name: "speakers" },
+  { id: "313eee86-bc11-4dc1-8cb0-6b2c2a2a1ccb", name: "trimmers" },
+  { id: "782e7829-806b-489f-8c3a-2689548d7153", name: "laptops" },
+  { id: "a6896b67-197c-4b2a-b5e2-93954474d8b4", name: "watches" },
+  { id: "4c2cc9ec-7504-4b7c-8ecd-2379a854a423", name: "headphones" },
+  { id: "8d2a091c-4b90-4d60-b191-114b895f3e54", name: "juicers" },
+  { id: "1cb9439a-ea47-4a33-913b-e9bf935bcc0b", name: "earbuds" },
+  { id: "ada699e5-e764-4da0-8d3e-18a8c8c5ed24", name: "tablets" },
+  { id: "d30b85e2-e544-4f48-8434-33fe0b591579", name: "phone-gimbals" },
+  { id: "6c3b8591-b01e-4842-bce1-2f5585bf3a28", name: "mixer-grinders" },
+  { id: "659a91b9-3ff6-47d5-9830-5e7ac905b961", name: "cameras" },
+  { id: "3117a1b0-6369-491e-8b8b-9fdd5ad9912e", name: "smart-phones" },
+  { id: "da6413b4-22fd-4fbb-9741-d77580dfdcd5", name: "mouses" },
+  { id: "ss6412b4-22fd-4fbb-9741-d77580dfdcd2", name: "computers" },
+  { id: "fs6412b4-22fd-4fbb-9741-d77512dfdfa3", name: "printers" }
 ];
 
 async function insertDemoData() {
-  // Insert categories, skipping any that already exist
+  console.log("🌱 Iniciando carga de datos (Con Encriptación)...");
+
+  // 1. Categorías
   await prisma.category.createMany({
     data: demoCategories,
-    skipDuplicates: true, // This will skip records with duplicate IDs
+    skipDuplicates: true,
   });
-  console.log("Demo categories inserted successfully!");
+  console.log("✅ Categorías listas.");
 
-  // Insert products, skipping any that already exist
+  // 2. Productos
   await prisma.product.createMany({
     data: demoProducts,
-    skipDuplicates: true, // This will skip records with duplicate IDs
+    skipDuplicates: true,
   });
-  console.log("Demo products inserted successfully!");
+  console.log("✅ Productos listos.");
+
+  // 3. Usuarios (¡Aquí está la corrección!)
+  
+  const saltRounds = 5; 
+  
+  const passwordUser = '12345678';
+  const passwordAdmin = 'Santi1240+';
+  
+  const hashedPasswordUser = await bcrypt.hash(passwordUser, saltRounds);
+  const hashedPasswordAdmin = await bcrypt.hash(passwordAdmin, saltRounds);
+
+  // Usuario Estándar (oglabuuglo)
+  await prisma.user.upsert({
+    where: { email: 'oglabuuglo@gmail.com' },
+    update: { password: hashedPasswordUser },
+    create: {
+        // name: 'Usuario',  <-- ELIMINAR
+        // lastname: 'Pruebas', <-- ELIMINAR
+        email: 'oglabuuglo@gmail.com',
+        password: hashedPasswordUser,
+        role: 'user',
+        // Si 'emailVerified' o 'image' también fallan, coméntalos también.
+        // Por ahora dejémoslos a ver si pasan.
+        // emailVerified: new Date(), 
+        // image: 'randomuser.jpg'
+    }
+  });
+  console.log("✅ User 'oglabuuglo' inserted/verified!");
+
+  // Usuario Admin (realmadrid)
+  await prisma.user.upsert({
+    where: { email: 'realmadrid@gmail.com' },
+    update: { role: 'admin' },
+    create: {
+        // name: 'Admin', <-- ELIMINAR
+        // lastname: 'User', <-- ELIMINAR
+        email: 'realmadrid@gmail.com',
+        password: hashedPasswordAdmin,
+        role: 'admin',
+        // emailVerified: new Date(),
+        // image: 'randomuser.jpg'
+    }
+  });
+  console.log("✅ Admin 'realmadrid' inserted/verified!");
 }
 
 insertDemoData()

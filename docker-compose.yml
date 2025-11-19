@@ -27,6 +27,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        
 
   # 3. Frontend (Next.js)
   frontend:
