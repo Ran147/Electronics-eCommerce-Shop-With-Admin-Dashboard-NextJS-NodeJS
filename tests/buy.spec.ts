@@ -83,7 +83,10 @@ test.describe('Módulo de Compras - Flujo de Checkout', () => {
         await page.getByRole('textbox', { name: 'Email address' }).fill('luis@gmail.com');
         await page.getByRole('textbox', { name: 'Password' }).fill('Santi1240+');
         await page.getByRole('button', { name: 'SIGN IN' }).click();
-        await page.waitForURL('/');
+        // Espera a que el login se complete (ajusta según tu app)
+        await page.waitForURL(/\/$/, { timeout: 10000 });
+        // Mejor aún: espera por un elemento que solo aparece cuando estás logueado
+        await page.waitForSelector('a[href="/cart"]', { state: 'visible', timeout: 10000 });
 
         // 2. El carrito debe tener al menos un producto
         await page.goto('/product/smart-watch-demo');

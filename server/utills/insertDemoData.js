@@ -212,11 +212,25 @@ async function insertDemoData() {
     }
   });
   console.log("✅ User 'oglabuuglo' inserted/verified!");
+  // --- Usuario 2: LUIS (¡EL QUE FALTABA!) ---
+  await prisma.user.upsert({
+    where: { email: 'luis@gmail.com' },
+    update: { password: hashedPasswordAdmin},
+    create: {
+        email: 'luis@gmail.com',
+        password: hashedPasswordAdmin,
+        role: 'user',
+        // name: 'Luis', 
+        // lastname: 'Pruebas',
+        // emailVerified: new Date(),
+        // image: 'randomuser.jpg'
+    }
+  });
 
   // Usuario Admin (realmadrid)
   await prisma.user.upsert({
     where: { email: 'realmadrid@gmail.com' },
-    update: { role: 'admin' },
+    update: { password: hashedPasswordAdmin },
     create: {
         // name: 'Admin', <-- ELIMINAR
         // lastname: 'User', <-- ELIMINAR

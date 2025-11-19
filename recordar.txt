@@ -6,6 +6,7 @@ prisma db -> npx prisma studio
 
 Para correr playwright: 
 npx playwright test --project=chromium
+npx playwright test tests/dashboard_admin.spec.ts --project=chromium --workers=1
 
 Para analizar con codegen
 npx playwright codegen http://localhost:3000/"direccion"
