@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 // --- CAMBIO 1: Definimos la URL base dinámicamente ---
 // Si Docker nos pasa la variable (http://frontend:3000), usamos esa.
 // Si no (tu PC local), usamos http://localhost:3000.
-const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+const baseURL = 'http://localhost:3000';
 
 /**
  * Read environment variables from file.
@@ -57,11 +57,5 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    // Asegúrate de que este sea el comando para iniciar tu frontend de Next.js
-    command: 'npm run dev',
-    url: baseURL, // --- CAMBIO 3: Usamos la variable para que busque en el lugar correcto ---
-    reuseExistingServer: true, // --- CAMBIO 4: Forzamos a true para que detecte que el frontend ya está corriendo ---
-    timeout: 120 * 1000, // --- CAMBIO 5: Damos 2 minutos de margen por si acaso ---
-  },
+  
 });
