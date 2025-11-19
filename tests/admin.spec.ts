@@ -10,7 +10,7 @@ test.describe('Módulo de Administrador (CP-ADM)', () => {
 
   /**
    * CÓDIGO: CP-ADM-006
-   * NOMBRE: Intento de acceso a una ruta de administrador por un usuario no autorizado.
+   * NOMBRE: Intento de acceso a una ruta de administrador por un usuario no autorizado. este falla
    *
    */
   test('CP-ADM-006: Intento de acceso a ruta admin por usuario no autorizado', async ({ page }) => {

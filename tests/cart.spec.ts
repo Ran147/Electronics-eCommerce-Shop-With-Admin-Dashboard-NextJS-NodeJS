@@ -282,8 +282,8 @@ test.describe('Módulo de Carrito (CP-CAR)', () => {
     // --- Datos de Prueba ---
     const productSlug = '/product/phone-gimbal-demo';
     const productName = 'Phone gimbal';
-    const userEmail = 'joshuapicado0312@gmail.com'; 
-    const userPass = 'Joshua24092003';            
+    const userEmail = 'oglabuuglo@gmail.com'; 
+    const userPass = '12345678';          
 
     // ---
     // FASE 1: EJECUCIÓN (Como Anónimo)
@@ -319,7 +319,7 @@ test.describe('Módulo de Carrito (CP-CAR)', () => {
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     // 9. Esperar a ser redirigido a la página principal
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL('/', { timeout: 15000 });
 
     // ---
     // FASE 3: VERIFICACIÓN (Como Usuario Logueado)

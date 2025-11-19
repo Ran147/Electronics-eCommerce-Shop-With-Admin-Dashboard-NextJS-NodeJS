@@ -210,10 +210,13 @@ test.describe('Módulo de Perfil y Gestión de Usuario', () => {
  * DESCRIPCIÓN: Verificar que un usuario autenticado puede agregar un producto 
  * a su lista de deseos desde la página de detalles del producto
  */
+    /**
+     * CÓDIGO: CP-WSH-001
+     * NOMBRE: Agregar producto a lista de deseos
+     */
     test('CP-WSH-001: Agregar producto a lista de deseos', async ({ page }) => {
 
         // --- PRECONDICIONES ---
-        // 1. El usuario debe estar autenticado
         await page.goto('/login');
         await page.getByRole('textbox', { name: 'Email address' }).fill('luis@gmail.com');
         await page.getByRole('textbox', { name: 'Password' }).fill('Santi1240+');
@@ -227,37 +230,42 @@ test.describe('Módulo de Perfil y Gestión de Usuario', () => {
 
         // --- PASOS ---
 
-        // Paso 1: Navegar a un producto específico (usando el enlace "View product")
-        // Buscar y hacer clic en un enlace "View product" que lleve a /product/smart-watch-demo
-        const viewProductLink = page.locator('a[href="/product/phone-gimbal-demo"]')
-            .filter({ has: page.locator('p:has-text("View product")') })
-            .first();
+        // Paso 1: Navegar a un producto específico
+        // Usamos navegación directa para ser más rápidos y evitar depender de la home
+        await page.goto('/product/phone-gimbal-demo');
 
-        await expect(viewProductLink).toBeVisible();
-        await viewProductLink.click();
+        // --- FASE DE LIMPIEZA (AUTOCORRECCIÓN) ---
+        // Antes de intentar agregar, verificamos si ya existe para borrarlo.
+        // Esto hace que la prueba sea "Idempotente" (funciona siempre).
+        
+        // Buscamos si aparece el botón de "REMOVE"
+        const removeButton = page.getByText('REMOVE FROM WISHLIST');
+        
+        if (await removeButton.isVisible()) {
+            console.log('🔄 El producto ya estaba en la lista. Limpiando estado...');
+            await removeButton.click();
+            // Esperamos confirmación de borrado
+            await expect(page.getByText('Product removed from the wishlist')).toBeVisible();
+            // Esperamos que el botón cambie a ADD
+            await expect(page.getByText('ADD TO WISHLIST')).toBeVisible();
+        }
 
-        // Verificar que estamos en la página del producto
-        await expect(page).toHaveURL('/product/phone-gimbal-demo');
+        // --- PRUEBA REAL ---
+        
+        // Paso 2: Hacer clic en "ADD TO WISHLIST"
+        // Usamos getByText, que es legible por humanos y resistente a cambios de iconos
+        const addButton = page.getByText('ADD TO WISHLIST');
 
-        // Paso 2: En la página del producto, hacer clic en el ícono de corazón (lista de deseos)
-        // Selector para el SVG del corazón basado en el path específico
-        const wishlistButton = page.locator('svg.text-xl.text-custom-black').filter({
-            has: page.locator('path[d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"]')
-        });
-
-        await expect(wishlistButton).toBeVisible();
-        await wishlistButton.click();
+        await expect(addButton).toBeVisible();
+        await addButton.click();
 
         // --- RESULTADOS ESPERADOS (ÉXITO) ---
 
-        // ÚNICO RESULTADO: Se muestra el mensaje específico de éxito
-        await expect(page.locator('div[role="status"]').filter({
-            hasText: 'Product added to the wishlist'
-        })).toBeVisible();
+        // Resultado: Se muestra el mensaje de éxito
+        // Usamos el manejador de notificaciones (toast)
+        await expect(page.getByText('Product added to the wishlist')).toBeVisible();
 
-        // Capturar evidencia del éxito
         console.log('✅ CP-WSH-001: Mensaje "Product added to the wishlist" mostrado correctamente');
     });
-
 
 });

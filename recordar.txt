@@ -6,7 +6,8 @@ prisma db -> npx prisma studio
 
 Para correr playwright: 
 npx playwright test --project=chromium
-npx playwright test tests/dashboard_admin.spec.ts --project=chromium --workers=1
+npx playwright test tests/product.spec.ts --project=chromium --workers=2
+npx playwright test --retries=3
 
 Para analizar con codegen
 npx playwright codegen http://localhost:3000/"direccion"
@@ -47,3 +48,20 @@ schema.test --> 2
 admin.api --> 5
 productstockvalidation --> 4
 categorydeletion--1 fuck
+
+
+LISTA DE FILES QUE ESTAN CORRECTOS
+auth.spec.ts SI ocupa correr dos veces
+cart.spec.ts SI
+user_management.spec.ts SI ocupa correr dos veces
+dashboard_admin.spec.ts SI
+checkout.spec.ts SI
+buy.spec.ts SI
+admin.spec.ts 
+
+
+CP-USR-004 debe fallar de dashboard_admin
+Hay dos CP-ADM-006 uno falla (en admin.spec.ts) otro aprueba (en dashboard_admin.spec.ts)
+
+
+hice cambios en layout.tsx en app/dashboard

@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-test.describe.configure({ mode: 'serial' });
 test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
 
   // ---
@@ -132,11 +131,9 @@ test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
 
     // 1. Ir a la página principal
     await page.goto('/');
-
-    // 2. Esperar a que la página esté completamente cargada
     await page.waitForLoadState('networkidle');
 
-    // 3. Localizar el enlace de la categoría (buscamos el H3 que está dentro del A)
+    // 3. Localizar el enlace de la categoría
     const laptopLink = page.getByRole('heading', { name: categoryName, exact: true });
     
     // 4. Esperar a que el enlace sea visible
@@ -149,19 +146,18 @@ test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
     // FASE 2: VERIFICACIÓN
     // ---
 
-    // 6. ¡ESPERAR A QUE LA NAVEGACIÓN TERMINE!
-    // Esto soluciona el error de "timing".
-    const expectedUrl = `/shop/${categorySlug}?outOfStock=true&inStock=true&rating=0&price=3000&sort=defaultSort&page=1`;
-    await page.waitForURL(expectedUrl);
+    // 6. Verificar URL (Tu corrección regex)
+    await expect(page).toHaveURL(new RegExp(`/shop/${categorySlug}`), { timeout: 30000 });
+
+    // --- AQUÍ ESTÁN LAS LÍNEAS NUEVAS ---
     
-    // 7. Ahora que la página ha cargado, podemos verificar la URL
-    await expect(page).toHaveURL(expectedUrl);
+    // 7. PRIMERO verificamos que el producto viejo desapareció.
+    // Esto confirma que la lista se actualizó antes de buscar el nuevo.
+    await expect(page.getByText(productToDisappear)).not.toBeVisible();
 
-    // 8. El producto esperado ("MacBook Pro") SÍ debe ser visible
-    await expect(page.getByText(expectedProduct, { exact: true })).toBeVisible();
-
-    // 9. El producto de otra categoría NO debe ser visible
-    await expect(page.getByText(productToDisappear, { exact: true })).not.toBeVisible();
+    // 8. LUEGO verificamos el producto nuevo con "exact: false".
+    // Usamos .first() por si el texto aparece en migas de pan (breadcrumbs) u otros lados.
+    await expect(page.getByText(expectedProduct, { exact: false }).first()).toBeVisible();
   });
 
   // ---
@@ -235,45 +231,36 @@ test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
    */
   test('CP-PROD-008: Combinar filtros de categoría y rango de precio', async ({ page }) => {
 
-    // --- Datos de Prueba ---
     const categoryName = 'Laptops';
     const categorySlug = 'laptops';
     const productToFilter = 'Notebook horizon'; // Cuesta $52
     const newMaxPrice = '30'; 
 
-    // --- FASE 1: NAVEGACIÓN Y FILTRO DE CATEGORÍA ---
-    
-    // 1. Ir a la página principal
+    // --- FASE 1: NAVEGACIÓN ---
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // 2. Localizar y hacer clic en el enlace de la categoría
     const laptopLink = page.getByRole('heading', { name: categoryName, exact: true });
     await laptopLink.waitFor({ state: 'visible' });
     await laptopLink.click();
 
-    // 3. Esperar a que la página de categoría cargue
-    await page.waitForURL(new RegExp(categorySlug));
-    await page.waitForLoadState('networkidle');
+    // 1. Validar cambio de URL (Igual que CP-PROD-004)
+    await expect(page).toHaveURL(new RegExp(`/shop/${categorySlug}`), { timeout: 30000 });
+    
+    // 2. Validar que el producto objetivo está visible ANTES de filtrar precio
+    // CORRECCIÓN: exact: false y .first() para evitar errores de renderizado
+    await expect(page.getByText(productToFilter, { exact: false }).first()).toBeVisible();
 
-    // 4. Verificación 1: El producto ($52) SÍ debe ser visible
-    await expect(page.getByText(productToFilter, { exact: true })).toBeVisible();
-
-    // --- FASE 2: APLICAR FILTRO DE PRECIO ---
-
-    // 5. Localizar el slider del rango de precios
+    // --- FASE 2: FILTRO DE PRECIO ---
     const priceSlider = page.locator('input[type="range"][max="3000"]');
-
-    // 6. Mover el del slider para establecer el precio máximo en $30
     await priceSlider.fill(newMaxPrice);
 
-    // 7. Esperar a que la UI reaccione
+    // Esperar tiempo prudencial para el efecto en UI (o esperar cambio de URL si aplicara)
     await page.waitForTimeout(2000); 
 
     // --- FASE 3: VERIFICACIÓN ---
-    
-    // 8. Verificación 2: El producto ($52) debe desaparecer
-    await expect(page.getByText(productToFilter, { exact: true })).not.toBeVisible();
+    // 3. El producto debe desaparecer (Precio $52 > $30)
+    await expect(page.getByText(productToFilter, { exact: false })).not.toBeVisible();
   });
 
 

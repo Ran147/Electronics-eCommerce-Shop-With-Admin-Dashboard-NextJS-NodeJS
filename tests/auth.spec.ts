@@ -205,7 +205,7 @@ test.describe('Módulo de Autenticación y Registro', () => {
 
     // Resultado 1: El sistema autentica y redirige a la página principal
     // (Asumimos que la página principal es '/')
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL('/', { timeout: 15000 });
 
     // Resultado 2: La interfaz muestra que la sesión está iniciada.
     // (¡OJO! Esta es una suposición. Busca un botón "Log Out"

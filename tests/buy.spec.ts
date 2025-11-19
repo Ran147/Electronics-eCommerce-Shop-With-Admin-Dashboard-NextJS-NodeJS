@@ -121,71 +121,55 @@ test.describe('Módulo de Compras - Flujo de Checkout', () => {
 
 
     test('CP-CHK-005: Completar orden de compra exitosa', async ({ page }) => {
-
         // --- PRECONDICIONES ---
-        // 1. El usuario debe estar autenticado
         await page.goto('/login');
         await page.getByRole('textbox', { name: 'Email address' }).fill('luis@gmail.com');
         await page.getByRole('textbox', { name: 'Password' }).fill('Santi1240+');
         await page.getByRole('button', { name: 'SIGN IN' }).click();
         await page.waitForURL('/');
 
-        // 2. El carrito debe tener al menos un producto
+        // 2. Agregar producto
         await page.goto('/product/smart-watch-demo');
         await page.waitForLoadState('networkidle');
         await page.getByRole('button', { name: 'Add to cart' }).first().click();
-        await page.waitForTimeout(1000);
+        await expect(page.getByText('Product added to the cart')).toBeVisible();
 
-        // 3. Navegar al checkout
-        await page.goto('/checkout');
-        await expect(page).toHaveURL('/checkout');
+        // --- NAVEGACIÓN ---
+        await page.goto('/cart');
+        await page.locator('a[href="/checkout"]').click();
 
-        // --- COMPLETAR INFORMACIÓN DE ENVÍO ---
-        // Usando los selectores exactos del HTML
-
-        // Información de contacto/email
+        // --- COMPLETAR FORMULARIO ---
+        await page.locator('input#name-input').fill('Luis');
+        await page.locator('input#lastname-input').fill('Prueba');
+        await page.locator('input#phone-input').fill('12345678');
         await page.locator('input#email-address').fill('luis@gmail.com');
-
-        // Información de dirección
         await page.locator('input#address').fill('Calle Principal 123');
         await page.locator('input#apartment').fill('Apto 4B');
         await page.locator('input#city').fill('Ciudad Ejemplo');
         await page.locator('input#company').fill('Mi Empresa SA');
-        await page.locator('input#region').fill("XD")
-        await page.locator('input#postal-code').fill("XD")
+        await page.locator('input#region').fill("Pais");
+        await page.locator('input#postal-code').fill("10101");
+        await page.locator('textarea#order-notice').fill('Entregar antes de las 5pm');
 
-
-        // Nota del pedido (textarea)
-        await page.locator('textarea#order-notice').fill('Por favor entregar antes de las 5pm');
-
-        // --- COMPLETAR INFORMACIÓN DE PAGO ---
-        // Usando los selectores específicos del HTML
-
-        // Campo: Nombre en la tarjeta
         await page.locator('input#name-on-card').fill('Real Madrid');
-
-        // Campo: Número de tarjeta
         await page.locator('input#card-number').fill('4111111111111111');
-
-        // Campo: Fecha de expiración
         await page.locator('input#expiration-date').fill('12/25');
-
-        // Campo: CVC
         await page.locator('input#cvc').fill('123');
 
-        // --- PASO PRINCIPAL: Hacer clic en "Pay Now" ---
+        // --- PASO PRINCIPAL ---
         await page.getByRole('button', { name: 'Pay Now' }).click();
 
-        // --- RESULTADOS ESPERADOS (ÉXITO) ---
+        // --- VALIDACIÓN ---
+        // 1. Mensaje de éxito
+        await expect(page.getByText('Order created successfuly')).toBeVisible({ timeout: 15000 });
 
+        // 2. Redirección a Home
+        await page.waitForURL('/', { timeout: 15000 });
 
-        await page.goto('/cart');
-
-        // Resultado 4: VERIFICAR QUE ORDER TOTAL ES $0 (stock eliminado)
-        await expect(page.locator('div.flex.items-center.justify-between.border-t.border-gray-200.pt-4')
-            .filter({ has: page.locator('dt:has-text("Order total")') })
-            .locator('dd')
-        ).toHaveText('$0');
+        // 3. Verificar Carrito Vacío (Contador en 0)
+        await expect(page.locator('div.relative span.bg-blue-600').filter({ hasText: '0' })).toBeVisible();
+        
+        console.log('✅ CP-CHK-005: Compra completada exitosamente');
     });
 
     test.describe('Módulo de Compras - Flujo de Checkout', () => {
