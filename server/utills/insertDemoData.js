@@ -195,6 +195,8 @@ async function insertDemoData() {
   const hashedPasswordUser = await bcrypt.hash(passwordUser, saltRounds);
   const hashedPasswordAdmin = await bcrypt.hash(passwordAdmin, saltRounds);
 
+  
+
   // Usuario Estándar (oglabuuglo)
   await prisma.user.upsert({
     where: { email: 'oglabuuglo@gmail.com' },
@@ -242,6 +244,20 @@ async function insertDemoData() {
     }
   });
   console.log("✅ Admin 'realmadrid' inserted/verified!");
+
+  await prisma.user.upsert({
+    where: { email: 'joshuapicado0312@gmail.com' },
+    update: { password: hashedPasswordUser },
+    create: {
+        email: 'joshuapicado0312@gmail.com',
+        password: hashedPasswordUser,
+        role: 'user',
+        // name: 'Joshua', // Opcional, según tu esquema
+    }
+  });
+  console.log("✅ User 'joshuapicado0312' insertado para pruebas!");
+
+
 }
 
 insertDemoData()
