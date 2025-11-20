@@ -125,39 +125,77 @@ test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
     const expectedProduct = 'Notebook horizon';
     const productToDisappear = 'Phone gimbal';
 
-    // ---
-    // FASE 1: EJECUCIÓN DEL TEST
-    // ---
-
-    // 1. Ir a la página principal
+    // --- FASE 1: EJECUCIÓN DEL TEST ---
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // 3. Localizar el enlace de la categoría
-    const laptopLink = page.getByRole('heading', { name: categoryName, exact: true });
-    
-    // 4. Esperar a que el enlace sea visible
+    const laptopLink = page.getByRole('link', { name: categoryName });
     await laptopLink.waitFor({ state: 'visible' });
-
-    // 5. Hacer clic en el enlace
     await laptopLink.click();
 
-    // ---
-    // FASE 2: VERIFICACIÓN
-    // ---
-
-    // 6. Verificar URL (Tu corrección regex)
+    // 1. Verificar navegación básica
     await expect(page).toHaveURL(new RegExp(`/shop/${categorySlug}`), { timeout: 30000 });
 
-    // --- AQUÍ ESTÁN LAS LÍNEAS NUEVAS ---
-    
-    // 7. PRIMERO verificamos que el producto viejo desapareció.
-    // Esto confirma que la lista se actualizó antes de buscar el nuevo.
-    await expect(page.getByText(productToDisappear)).not.toBeVisible();
+    // --- CORRECCIÓN INFALIBLE: Selector por Estructura DOM ---
+    // En lugar de getByLabel (que falla con DaisyUI), buscamos el contenedor label
+    // que tiene el texto y luego bajamos al input.
+    const outOfStockLabel = page.locator('label').filter({ hasText: 'Out of stock' });
+    const outOfStockCheckbox = outOfStockLabel.locator('input[type="checkbox"]');
 
-    // 8. LUEGO verificamos el producto nuevo con "exact: false".
-    // Usamos .first() por si el texto aparece en migas de pan (breadcrumbs) u otros lados.
+    // Esperamos a que exista en el DOM (attached) antes de interactuar
+    await outOfStockCheckbox.waitFor({ state: 'attached', timeout: 10000 });
+    
+    // Forzamos el desmarcado ignorando si el estilo lo tapa visualmente
+    await outOfStockCheckbox.uncheck({ force: true });
+
+    // 2. Verificar que la URL refleje el cambio (outOfStock=false)
+    await expect(page).toHaveURL(/outOfStock=false/, { timeout: 10000 });
+
+    // --- FASE 2: VERIFICACIÓN DE PRODUCTOS ---
+    await expect(page.getByText(productToDisappear)).not.toBeVisible();
     await expect(page.getByText(expectedProduct, { exact: false }).first()).toBeVisible();
+  });
+  test('CP-PROD-008: Combinar filtros de categoría y rango de precio', async ({ page }) => {
+
+    const categoryName = 'Laptops';
+    const categorySlug = 'laptops';
+    const productToFilter = 'Notebook horizon'; 
+    const newMaxPrice = '30'; 
+
+    // --- FASE 1: NAVEGACIÓN ---
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const laptopLink = page.getByRole('link', { name: categoryName });
+    await laptopLink.waitFor({ state: 'visible' });
+    await laptopLink.click();
+
+    await expect(page).toHaveURL(new RegExp(`/shop/${categorySlug}`), { timeout: 30000 });
+
+    // --- CORRECCIÓN INFALIBLE ---
+    const outOfStockLabel = page.locator('label').filter({ hasText: 'Out of stock' });
+    const outOfStockCheckbox = outOfStockLabel.locator('input[type="checkbox"]');
+
+    await outOfStockCheckbox.waitFor({ state: 'attached', timeout: 10000 });
+    await outOfStockCheckbox.uncheck({ force: true });
+
+    // Esperamos confirmación en la URL
+    await expect(page).toHaveURL(/outOfStock=false/, { timeout: 10000 });
+
+    // 1. Validar que el producto objetivo ya es visible
+    await expect(page.getByText(productToFilter, { exact: false }).first()).toBeVisible();
+
+    // --- FASE 2: FILTRO DE PRECIO ---
+    const priceSlider = page.locator('input[type="range"][max="3000"]');
+    // Forzamos también el slider por si acaso tiene estilos personalizados
+    await priceSlider.fill(newMaxPrice, { force: true });
+
+    // 2. Esperar actualización de URL por precio
+    await expect(page).toHaveURL(/price=30/, { timeout: 10000 });
+
+    // --- FASE 3: VERIFICACIÓN ---
+    // 3. El producto debe desaparecer
+    await expect(page.getByText(productToFilter, { exact: false })).not.toBeVisible();
   });
 
   // ---
@@ -229,41 +267,7 @@ test.describe('Módulo de Búsqueda y Visualización (CP-PROD)', () => {
    * CÓDIGO: CP-PROD-008
    * NOMBRE: Combinar filtros de categoría y rango de precio (Adaptado).
    */
-  test('CP-PROD-008: Combinar filtros de categoría y rango de precio', async ({ page }) => {
-
-    const categoryName = 'Laptops';
-    const categorySlug = 'laptops';
-    const productToFilter = 'Notebook horizon'; // Cuesta $52
-    const newMaxPrice = '30'; 
-
-    // --- FASE 1: NAVEGACIÓN ---
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    const laptopLink = page.getByRole('heading', { name: categoryName, exact: true });
-    await laptopLink.waitFor({ state: 'visible' });
-    await laptopLink.click();
-
-    // 1. Validar cambio de URL (Igual que CP-PROD-004)
-    await expect(page).toHaveURL(new RegExp(`/shop/${categorySlug}`), { timeout: 30000 });
-    
-    // 2. Validar que el producto objetivo está visible ANTES de filtrar precio
-    // CORRECCIÓN: exact: false y .first() para evitar errores de renderizado
-    await expect(page.getByText(productToFilter, { exact: false }).first()).toBeVisible();
-
-    // --- FASE 2: FILTRO DE PRECIO ---
-    const priceSlider = page.locator('input[type="range"][max="3000"]');
-    await priceSlider.fill(newMaxPrice);
-
-    // Esperar tiempo prudencial para el efecto en UI (o esperar cambio de URL si aplicara)
-    await page.waitForTimeout(2000); 
-
-    // --- FASE 3: VERIFICACIÓN ---
-    // 3. El producto debe desaparecer (Precio $52 > $30)
-    await expect(page.getByText(productToFilter, { exact: false })).not.toBeVisible();
-  });
-
-
+ 
   /*
    * =================================================================
    * CP-USR-006: VER DESCRIPCIÓN DE PRODUCTO

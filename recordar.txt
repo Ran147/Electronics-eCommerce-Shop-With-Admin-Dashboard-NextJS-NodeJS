@@ -5,8 +5,8 @@ frontend-> npm run dev
 prisma db -> npx prisma studio
 
 Para correr playwright: 
-npx playwright test --project=chromium
-npx playwright test tests/product.spec.ts --project=chromium --workers=2
+npx playwright test --project=chromium --workers=6
+npx playwright test tests/ui.spec.ts --project=chromium --workers=2
 npx playwright test --retries=3
 
 Para analizar con codegen
