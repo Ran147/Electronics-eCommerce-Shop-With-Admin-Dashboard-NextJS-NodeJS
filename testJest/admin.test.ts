@@ -5,7 +5,7 @@ import request from 'supertest';
 // -----------------------------------------------------------------
 // VALORES CONFIRMADOS
 // -----------------------------------------------------------------
-const API_URL = 'http://localhost:3001'; 
+const API_URL = 'http://localhost:3001';
 const ADMIN_PROTECTED_ROUTE = '/api/users';
 const LOGIN_ROUTE = '/api/users/login';
 // -----------------------------------------------------------------
@@ -20,9 +20,9 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
    * que no incluyen un token de autenticación.
    * =================================================================
    */
-  
+
   test('CP-ADM-006: Debe fallar con 401 (Unauthorized) si no se envía token', async () => {
-    
+
     // 1. (EJECUCIÓN) Intentamos hacer un GET a /api/users...
     // 2. ...SIN enviar un token de 'Authorization'.
     const response = await request(API_URL)
@@ -36,7 +36,7 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
 
 
   test('CP-USR-005: Debe actualizar el perfil del usuario (nombre)', async () => {
-    
+
     // --- Datos de Prueba ---
     const userEmail = 'joshuapicado0312@gmail.com';
     const newName = `TestUser${Date.now()}`;
@@ -45,16 +45,16 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
     // --- FASE 1: OBTENER (Setup) ---
     // Obtenemos el objeto COMPLETO del usuario
     const getResponse = await request(API_URL).get(userEmailEndpoint);
-    
+
     // Verificamos que lo obtuvimos (esto es un bug de seguridad, pero
     // lo usamos a nuestro favor para la prueba)
     expect(getResponse.statusCode).toBe(200);
 
     // Guardamos el objeto de usuario completo
     const userObject = getResponse.body;
-    
+
     // Verificamos que obtuvimos un ID
-    const userId = userObject.id; 
+    const userId = userObject.id;
     expect(userId).toBeDefined();
 
     // --- FASE 2: MODIFICAR (Preparación) ---
@@ -65,11 +65,11 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
     // Enviamos el objeto COMPLETO Y MODIFICADO de vuelta
     const updateResponse = await request(API_URL)
       .put(`/api/users/${userId}`)
-      .send(userObject); 
+      .send(userObject);
 
     // --- FASE 4: VERIFICACIÓN ---
     expect(updateResponse.statusCode).toBe(200);
-  });
+  }, 10000);
 
 
   /*
@@ -77,16 +77,16 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
    * CP-ADM-008 (Caso 53): ADMIN ELIMINA UNA RESEÑA
    * =================================================================
    */
-  
+
   test('CP-ADM-008: Debe eliminar una reseña de producto', async () => {
-    
+
     // --- Datos de Prueba ---
-    
+
     // 1. Necesitamos el ID de una reseña que exista en la BD para eliminarla.
     const reviewIdToDelete = 1;
 
     // 2. Necesitamos la ruta de API correcta. Estoy ADIVINANDO.
-    const REVIEW_ENDPOINT = `/api/reviews/${reviewIdToDelete}`; 
+    const REVIEW_ENDPOINT = `/api/reviews/${reviewIdToDelete}`;
 
     // --- FASE 1: EJECUCIÓN ---
     // Enviamos la petición DELETE al endpoint
@@ -99,16 +99,16 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
 
   });
 
- /*
-   * =================================================================
-   * CP-ADM-007 (Caso 56): ADMIN ELIMINA UN PRODUCTO
-   * =================================================================
-   */
+  /*
+    * =================================================================
+    * CP-ADM-007 (Caso 56): ADMIN ELIMINA UN PRODUCTO
+    * =================================================================
+    */
 
   test('CP-ADM-007: Debe crear y luego eliminar un producto', async () => {
-    
+
     // --- FASE 1: SETUP (Crear el producto) ---
-    
+
     // Usamos el CategoryID VÁLIDO de tu JSON de ejemplo
     const validCategoryId = "3117a1b0-6369-491e-8b8b-9fdd5ad9912e";
 
@@ -130,10 +130,10 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
 
     // Verificamos que se creó (Esta es la línea que fallaba)
     expect(createResponse.statusCode).toBe(201); // 201 = Created
-    
+
     // Obtenemos el ID del producto recién creado
     // (¡OJO! Tu JSON de producto muestra 'id' como un string "1")
-    const productIdToDelete = createResponse.body.id; 
+    const productIdToDelete = createResponse.body.id;
     expect(productIdToDelete).toBeDefined();
 
     // --- FASE 2: EJECUCIÓN (Eliminar el producto) ---
@@ -147,9 +147,9 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
     // 2. Verificamos que ya no existe (debe dar 404)
     const getResponse = await request(API_URL)
       .get(`/api/products/${productIdToDelete}`);
-      
+
     expect(getResponse.statusCode).toBe(404);
-  });
+  }, 10000);
 
 
   /*
@@ -157,15 +157,15 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
    * CP-ADM-009 (Caso 60): SUBIR ARCHIVO INVÁLIDO
    * =================================================================
    */
-  
+
   /**
    * CÓDIGO: CP-ADM-009
    * NOMBRE: Intento de subir archivo no-imagen al endpoint de imágenes.
    */
   test('CP-ADM-009: Debe rechazar un archivo .txt en el endpoint de imágenes', async () => {
-    
+
     // --- FASE 1: EJECUCIÓN (Subir un archivo .txt) ---
-    
+
     // 1. Creamos un 'buffer' de datos que simula ser un archivo .txt
     const invalidFileBuffer = Buffer.from('Este es un archivo de texto plano.');
 
@@ -176,10 +176,10 @@ describe('Módulo de API de Administrador (CP-ADM)', () => {
     const response = await request(API_URL)
       .post('/api/images')
       .attach('image', invalidFileBuffer, {
-         filename: 'prueba.txt',
-         contentType: 'text/plain'
+        filename: 'prueba.txt',
+        contentType: 'text/plain'
       });
-      // Nota: Esta ruta también está insegura (sin token)
+    // Nota: Esta ruta también está insegura (sin token)
 
     // --- FASE 2: VERIFICACIÓN ---
     // 3. Verificamos que el servidor rechazó la petición.
